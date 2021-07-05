@@ -35,26 +35,32 @@ const getNeWItem = async (req, res) => {
 
 const deleteNeWItem = async (req, res) => {
     const name = req.params.name;
-    crudModel.deleteOne({name:name},(error, data) => {
+    crudModel.remove({name:name},(error, data) => {
         if (error) {
             res.send(error)
         } else {
-            res.send(data)
+            crudModel.find({}, (error, data) => {
+                res.send(data);
+            })
         }
     })
 }
 
 const updateNeWItem = async (req, res) => {
-    const name = req.params.name;
-    const {level} = req.body;
-    crudModel.findOne({name:name},(error,data)=>{
+    const id = req.params.id;
+    const {level,name} = req.body;
+    crudModel.findOne({_id:id},(error,data)=>{
         if(error){
          res.send(error);
         }else{
-         
+            data.name=name,
             data.level=level,
-            data.save();
-            res.send(data)
+            data.save().then(()=>{
+                crudModel.find({}, (error, data) => {
+                    res.send(data);
+                })
+            })
+           
 
         }
     })
